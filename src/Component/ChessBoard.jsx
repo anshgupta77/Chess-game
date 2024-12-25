@@ -15,10 +15,9 @@ const ChessBoard = () => {
             if(piece.color === turn){
                 setSelectedPiece({i,j});
                 getNamePieceSelected(i,j);
-                // return;
+
             }
         }
-        // else {
         if(isValidMove(i,j)){
                     const newBoardObject = [...boardObject]; // this create only the reference of the outer object only..
                     console.log(selectedPiece)
@@ -34,78 +33,161 @@ const ChessBoard = () => {
                 }    
             // }
         }
-    // function isValidMove(i, j){
-    //     const pieceColor = boardObject[i][j].color;
-    //     if(pieceColor === turn){
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     function isValidMove(i, j) {
         const targetCell = boardObject[i][j];
-    
-        // Target cell must be empty or contain an opponent's piece
-        return targetCell.src === "" || targetCell.color !== turn;
+
+        return targetCell.dropable;
     }
 
-    function handleRook(Xordinate,Yordinate){
-        // console.log("Co-ordinate of rook",Xordinate, Yordinate)
+    function getValidMoves(pieceName, x, y) {
+        const moves = [];
+        switch (pieceName) {
+            case "rook":
+                addStraightLineMoves(moves, x, y);
+                break;
+            case "bishop":
+                addDiagonalMoves(moves, x, y);
+                break;
+            case "queen":
+                addStraightLineMoves(moves, x, y);
+                addDiagonalMoves(moves, x, y);
+                break;
+            case "knight":
+                addKnightMoves(moves, x, y);
+                break;
+            // case "king":
+            //     addKingMoves(moves, x, y);
+            //     break;
+            case "pawn":
+                addPawnMoves(moves, x, y);
+                break;
+            default:
+                break;
+        }
+        return moves;
+    }
+    function addPawnMoves(moves, x, y){
+        if(turn === "white"){
+            moves.push([x-1,y]);
+        }
+        else{
+            moves.push([x+1,y]);
+        }
+    }
+    function addStraightLineMoves(moves, x, y) {
+        for (let i = x + 1; i < 8; i++) {
+            if (boardObject[i][y].src !== "") {
+                if(turn !== boardObject[i][y].color){
+                    moves.push([i, y]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, y]);
+        }
+        for (let i = x - 1; i >= 0; i--) {
+            if (boardObject[i][y].src !== "") {
+                if(turn !== boardObject[i][y].color){
+                    moves.push([i, y]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, y]);
+        }
+        for (let j = y + 1; j < 8; j++) {
+            if (boardObject[x][j].src !== "") {
+                if(turn !== boardObject[x][j].color){
+                    moves.push([x, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([x, j]);
+        }
+        for (let j = y - 1; j >= 0; j--) {
+            if (boardObject[x][j].src !== "") {
+                if(turn !== boardObject[x][j].color){
+                    moves.push([x, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([x, j]);
+        }
+    }
+
+    function addDiagonalMoves(moves, x, y) {
+        for (let i = x + 1, j = y + 1; i < 8 && j < 8; i++, j++) {
+            if (boardObject[i][j].src !== "") {
+                if(turn !== boardObject[i][j].color){
+                    moves.push([i, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, j]);
+        }
+        for (let i = x - 1, j = y - 1; i >= 0 && j >= 0; i--, j--) {
+            if (boardObject[i][j].src !== "") {
+                if(turn !== boardObject[i][j].color){
+                    moves.push([i, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, j]);
+        }
+        for (let i = x + 1, j = y - 1; i < 8 && j >= 0; i++, j--) {
+            if (boardObject[i][j].src !== "") {
+                if(turn !== boardObject[i][j].color){
+                    moves.push([i, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, j]);
+        }
+        for (let i = x - 1, j = y + 1; i >= 0 && j < 8; i--, j++) {
+            if (boardObject[i][j].src !== "") {
+                if(turn !== boardObject[i][j].color){
+                    moves.push([i, j]);
+                    break;
+                }
+                break;
+            }
+            moves.push([i, j]);
+        }
+    }
+
+    function addKnightMoves(moves, x, y) {
+        const knightMoves = [
+            [x - 2, y - 1], [x - 2, y + 1],
+            [x + 2, y - 1], [x + 2, y + 1],
+            [x - 1, y - 2], [x - 1, y + 2],
+            [x + 1, y - 2], [x + 1, y + 2],
+        ];
+        knightMoves.forEach(([i, j]) => {
+            if (i >= 0 && i < 8 && j >= 0 && j < 8) {
+                if(boardObject[i][j].color !== turn)
+                    moves.push([i, j]);
+            }
+        });
+    }
+
+    function markValidMoves(moves) {
         const newBoardObject = [...boardObject];
-
-        //move Down;
-        for(let i=Xordinate+1; i<8; i++){
-            if(newBoardObject[i][Yordinate].src !== ""){
-                break;
-            }
-            // console.log("Move Down",i, Yordinate);
-            newBoardObject[i][Yordinate].dropable = true;
-        }
-        //move up;
-        for(let i=Xordinate-1; i>=0; i--){
-            if(newBoardObject[i][Yordinate].src !== ""){
-                console.log(i, Yordinate);
-                break;
-            }
-            // console.log("Move Up",i, Yordinate);
-            newBoardObject[i][Yordinate].dropable = true;
-        }
-
-        //move right
-        for(let j=Yordinate+1; j<8; j++){
-            if(newBoardObject[Xordinate][j].src !== ""){
-                break;
-            }
-            // console.log("Move right",Xordinate,j);
-            newBoardObject[Xordinate][j].dropable = true;
-        }
-
-        //move left
-        for(let j=Yordinate-1; j>=0; j--){
-            if(newBoardObject[Xordinate][j].src !== ""){
-                break;
-            }
-            // console.log("Move left",Xordinate,j);
-            newBoardObject[Xordinate][j].dropable = true;
-        }
-        // console.log("NewBoardObject",  newBoardObject)
+        moves.forEach(([i, j]) => {
+            newBoardObject[i][j].dropable = true;
+        });
         setBoardObject(newBoardObject);
-    
     }
-    function getNamePieceSelected(Xordinate,Yordinate){
-        console.log(Xordinate, Yordinate);
-        const pieceName = boardObject[Xordinate][Yordinate].name;
-        console.log(pieceName);
-        // return;
-        switch (pieceName){
-            case "rook" : {
-                console.log(Xordinate, Yordinate);
-                handleRook(Xordinate,Yordinate);
-                break;
 
-            }
-            default: console.log("Invalid input");
-        }
+    function getNamePieceSelected(x, y) {
+        const pieceName = boardObject[x][y].name;
+        const moves = getValidMoves(pieceName, x, y);
+        markValidMoves(moves);
     }
     function clearDropable(){
         // if(initialState === boardObject) return;
@@ -117,9 +199,7 @@ const ChessBoard = () => {
         }
         setBoardObject(newBoardObject);
     }
-    // if(selectedPiece){
-    //     getNamePieceSelected(selectedPiece);
-    // }
+    
     
     function chessBoard() {
         const board = [];
@@ -135,7 +215,7 @@ const ChessBoard = () => {
                         }`}
                     >
                         {boardObject[i][j].dropable ? (
-                            <div className="rounded-full w-3 h-3 bg-green-500" >
+                            <div className={`rounded-full w-3 h-3 bg-green-400`} >
                                 
                             </div>) : <></>}
                         {boardObject[i][j].src !== "" && (
