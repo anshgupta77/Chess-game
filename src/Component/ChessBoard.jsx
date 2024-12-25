@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { initialState } from "../service/initialState";
+
 const ChessBoard = () => {
     const [boardObject, setBoardObject] = useState(initialState);
     const [selectedPiece , setSelectedPiece] = useState(null);
@@ -56,9 +57,9 @@ const ChessBoard = () => {
             case "knight":
                 addKnightMoves(moves, x, y);
                 break;
-            // case "king":
-            //     addKingMoves(moves, x, y);
-            //     break;
+            case "king":
+                addKingMoves(moves, x, y);
+                break;
             case "pawn":
                 addPawnMoves(moves, x, y);
                 break;
@@ -67,6 +68,22 @@ const ChessBoard = () => {
         }
         return moves;
     }
+    function addKingMoves(moves, x, y){
+        const KingMoves = [
+            [x+1, y+1],[x+1, y-1],
+            [x-1, y+1],[x-1, y-1],
+            [x,y+1], [x, y-1],
+            [x+1,y], [x-1, y],
+        ]
+
+        KingMoves.forEach(([i,j]) =>{
+            if(i>=0 && i<8 && j>=0 && j<8){
+                if(boardObject[i][j].color != turn)
+                moves.push([i,j]);
+            }
+        })
+    }
+
     function addPawnMoves(moves, x, y){
         if(turn === "white"){
             moves.push([x-1,y]);
@@ -163,10 +180,10 @@ const ChessBoard = () => {
 
     function addKnightMoves(moves, x, y) {
         const knightMoves = [
-            [x - 2, y - 1], [x - 2, y + 1],
-            [x + 2, y - 1], [x + 2, y + 1],
-            [x - 1, y - 2], [x - 1, y + 2],
-            [x + 1, y - 2], [x + 1, y + 2],
+            [x - 2, y - 1],[x - 1, y - 2],
+            [x - 2, y + 1],[x - 1, y + 2],
+            [x + 2, y - 1],[x + 1, y - 2], 
+            [x + 2, y + 1],[x + 1, y + 2],   
         ];
         knightMoves.forEach(([i, j]) => {
             if (i >= 0 && i < 8 && j >= 0 && j < 8) {
@@ -200,7 +217,7 @@ const ChessBoard = () => {
         setBoardObject(newBoardObject);
     }
     
-    
+    const validMovesColor = turn === "white"? 'bg-green-400': `bg-red-400`; 
     function chessBoard() {
         const board = [];
         for (let i = 0; i < 8; i++) {
@@ -210,19 +227,19 @@ const ChessBoard = () => {
                     <div
                         key={key}
                         onClick={() => handleCellClick(i, j)}
-                        className={`w-12 h-12 flex justify-center items-center ${
-                            (i + j) % 2 === 0 ? "bg-yellow-200" : "bg-gray-600"
-                        }`}
+                        className={`w-12 h-12 flex justify-center items-center
+                            ${(i + j) % 2 === 0 ? "bg-yellow-200" : "bg-gray-600"} 
+                            ${boardObject[i][j].dropable ? `cursor-pointer` : boardObject[i][j].src === "" ? `cursor-not-allowed`: `` }`}
                     >
                         {boardObject[i][j].dropable ? (
-                            <div className={`rounded-full w-3 h-3 bg-green-400`} >
+                            <div className={`rounded-full w-3 h-3 ${validMovesColor}`} >
                                 
-                            </div>) : <></>}
+                            </div>): <></>}
                         {boardObject[i][j].src !== "" && (
                             <img
                                 src={`${boardObject[i][j].src}`}
                                 alt={boardObject[i][j].src}
-                                className="w-8 h-8"
+                                className={`w-8 h-8 cursor-pointer`}
                             />
                         )}
                     </div>
