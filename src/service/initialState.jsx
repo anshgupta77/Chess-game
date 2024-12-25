@@ -16,8 +16,8 @@ export const initialState = [
         { src: rook_black, color: "black", name: "rook", dropable: false },
         { src: knight_black, color: "black", name: "knight" , dropable: false},
         { src: bishop_black, color: "black", name: "bishop" , dropable: false },
-        { src: queen_black, color: "black", name: "queen"  , dropable: false },
         { src: king_black, color: "black", name: "king"  , dropable: false },
+        { src: queen_black, color: "black", name: "queen"  , dropable: false },
         { src: bishop_black, color: "black", name: "bishop"  , dropable: false },
         { src: knight_black, color: "black", name: "knight"  , dropable: false },
         { src: rook_black, color: "black", name: "rook"  , dropable: false }
