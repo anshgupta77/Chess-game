@@ -86,9 +86,15 @@ const ChessBoard = () => {
 
     function addPawnMoves(moves, x, y){
         if(turn === "white"){
+            if(x === 6){
+                moves.push([x-2,y]);
+            }
             moves.push([x-1,y]);
         }
         else{
+            if(x === 1) {
+                moves.push([x+2, y]);
+            }
             moves.push([x+1,y]);
         }
     }
@@ -249,13 +255,18 @@ const ChessBoard = () => {
         return board;
     }
     
-
     return (
-        <div className="h-[100vh] flex justify-center items-center bg-slate-200">
-            <div className="grid grid-cols-8 w-96 h-96">{chessBoard()}</div>
-            <div>{turn} Turn</div>
+        <div className="h-[100vh] flex flex-col justify-center items-center bg-slate-600">
+            <h1 className="text-4xl mb-6 text-white text-pretty font-extrabold">Let's play!!!</h1>
+            <div className="grid grid-cols-8 w-96 h-96 bg-white rounded-lg border-4 border-gray-100">
+                {chessBoard()}
+            </div>
+            <div className="mt-4 p-4 bg-purple-700 text-white text-2xl font-bold rounded-lg shadow-lg">
+                <span className="capitalize">{turn}</span>'s Turn
+            </div>
         </div>
     );
+    
 };
 
 export default ChessBoard;
