@@ -5,41 +5,48 @@ const ChessBoard = () => {
     const [boardObject, setBoardObject] = useState(initialState);
     const [selectedPiece , setSelectedPiece] = useState(null);
     const [turn, setTurn] = useState("white");
-    // console.log("BoardState", boardObject);
+    console.log("BoardState", boardObject);
 
-
-
-    function deepCopyBoard(board) {
-        return board.map(row => row.map(cell => ({ ...cell })));
-    }
     function handleCellClick(i, j) {
         const piece = boardObject[i][j];
         console.log("Piece name", piece.name);
-        if(!selectedPiece){
-            // return ;
-                // console.log("Selected piece", )
+        console.log(selectedPiece)
+        if(!selectedPiece  || (piece.src !== "")){
+            if(piece.color === turn){
                 setSelectedPiece({i,j});
                 getNamePieceSelected(i,j);
-        }else{
-                if((piece.src === "") || (piece.src !== "" && piece.color !== turn)){
-                    if(isValidMove(selectedPiece.i, selectedPiece.j)){
-                        const newBoardObject = [...boardObject];
-                        newBoardObject[i][j] = boardObject[selectedPiece.i][selectedPiece.j];
-                        newBoardObject[selectedPiece.i][selectedPiece.j] = {src: "", color: "", name: "", dropable: false};
-                        setBoardObject(newBoardObject);
-                        setTurn(prev => prev === "white" ? "black" : "white");
-                    }
-                    clearDropable();
-                    setSelectedPiece(null);
-                }
+                // return;
             }
         }
-    function isValidMove(i, j){
-        const pieceColor = boardObject[i][j].color;
-        if(pieceColor === turn){
-            return true;
+        // else {
+        if(isValidMove(i,j)){
+                    const newBoardObject = [...boardObject]; // this create only the reference of the outer object only..
+                    console.log(selectedPiece)
+                    
+                    newBoardObject[i][j] = {...boardObject[selectedPiece.i][selectedPiece.j]};
+                    console.log(selectedPiece)
+
+                    newBoardObject[selectedPiece.i][selectedPiece.j] = {src: "", color: "", name: "", dropable: false};
+                    setBoardObject(newBoardObject);
+                    setTurn(prev => (prev === "white" ? "black" : "white"));
+                    clearDropable();
+                    setSelectedPiece(null); 
+                }    
+            // }
         }
-        return false;
+    // function isValidMove(i, j){
+    //     const pieceColor = boardObject[i][j].color;
+    //     if(pieceColor === turn){
+    //         return true;
+    //     }
+    //     return false;
+    // }
+
+    function isValidMove(i, j) {
+        const targetCell = boardObject[i][j];
+    
+        // Target cell must be empty or contain an opponent's piece
+        return targetCell.src === "" || targetCell.color !== turn;
     }
 
     function handleRook(Xordinate,Yordinate){
@@ -129,7 +136,7 @@ const ChessBoard = () => {
                     >
                         {boardObject[i][j].dropable ? (
                             <div className="rounded-full w-3 h-3 bg-green-500" >
-                                .
+                                
                             </div>) : <></>}
                         {boardObject[i][j].src !== "" && (
                             <img
