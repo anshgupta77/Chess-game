@@ -14,6 +14,7 @@ const ChessBoard = () => {
         console.log(selectedPiece)
         if(!selectedPiece  || (piece.src !== "")){
             if(piece.color === turn){
+                clearDropable();
                 setSelectedPiece({i,j});
                 getNamePieceSelected(i,j);
 
@@ -29,9 +30,10 @@ const ChessBoard = () => {
                     newBoardObject[selectedPiece.i][selectedPiece.j] = {src: "", color: "", name: "", dropable: false};
                     setBoardObject(newBoardObject);
                     setTurn(prev => (prev === "white" ? "black" : "white"));
-                    clearDropable();
+                    
+                    clearDropable();  
                     setSelectedPiece(null); 
-                }    
+                }
             // }
         }
 
