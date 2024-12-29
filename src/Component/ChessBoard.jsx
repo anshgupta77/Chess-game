@@ -1,40 +1,76 @@
-
 import { useState } from "react";
-import { initialState } from "../service/initialState";
+import { initialState, initialBoardState } from "../service/InitialState";
+
 
 const ChessBoard = () => {
-    const [boardObject, setBoardObject] = useState(initialState);
+    const [boardObject, setBoardObject] = useState([...initialState]);
     const [selectedPiece , setSelectedPiece] = useState(null);
     const [turn, setTurn] = useState("white");
-    console.log("BoardState", boardObject);
+    const [gameOver, setGameOver] = useState(null);
+    // console.log("BoardState", boardObject);
 
     function handleCellClick(i, j) {
+        if(gameOver !== null){
+            return;
+        }
         const piece = boardObject[i][j];
         console.log("Piece name", piece.name);
         console.log(selectedPiece)
         if(!selectedPiece  || (piece.src !== "")){
             if(piece.color === turn){
+                clearDropable();
                 setSelectedPiece({i,j});
                 getNamePieceSelected(i,j);
 
             }
         }
         if(isValidMove(i,j)){
-                    const newBoardObject = [...boardObject]; // this create only the reference of the outer object only..
-                    console.log(selectedPiece)
-                    
-                    newBoardObject[i][j] = {...boardObject[selectedPiece.i][selectedPiece.j]};
-                    console.log(selectedPiece)
-
-                    newBoardObject[selectedPiece.i][selectedPiece.j] = {src: "", color: "", name: "", dropable: false};
-                    setBoardObject(newBoardObject);
-                    setTurn(prev => (prev === "white" ? "black" : "white"));
-                    clearDropable();
-                    setSelectedPiece(null); 
+                    if(checkKingDefeated(i,j)){
+                        handleWinnig();
+                        return;
+                    }
+                    else{
+                        const newBoardObject = [...boardObject]; // this create only the reference of the outer object only..
+                        console.log(selectedPiece)
+                        
+                        newBoardObject[i][j] = {...boardObject[selectedPiece.i][selectedPiece.j]};
+                        console.log(selectedPiece)
+    
+                        newBoardObject[selectedPiece.i][selectedPiece.j] = {src: "", color: "", name: "", dropable: false};
+                        setBoardObject(newBoardObject);
+                        setTurn(prev => (prev === "white" ? "black" : "white"));
+    
+                        clearDropable();
+                        setSelectedPiece(null); 
+                    }
                 }    
             // }
         }
 
+    function checkKingDefeated(i,j){
+        const targetedpiece = boardObject[i][j];
+        console.log("Target piece", targetedpiece);
+        const selectPiece = boardObject[selectedPiece.i][selectedPiece.j]; 
+        console.log("Selected piece", selectPiece);
+        // if(selectPiece.name !== "king" && targetedpiece.name === "king"){
+        //     return true;
+        // }
+        if(targetedpiece.name === "king" && targetedpiece.color!==turn){
+            return true;
+        }
+        return false;
+    }
+    function handleRestart(){
+        setTurn("white");
+        setBoardObject([...initialBoardState]);
+        setGameOver(null);
+    }
+    function handleWinnig(){
+        const playerWinning = turn;
+        setGameOver(playerWinning);
+        console.log("Initial",initialState)
+        console.log("Final Board State",initialState)
+    } 
     function isValidMove(i, j) {
         const targetCell = boardObject[i][j];
 
@@ -78,7 +114,7 @@ const ChessBoard = () => {
 
         KingMoves.forEach(([i,j]) =>{
             if(i>=0 && i<8 && j>=0 && j<8){
-                if(boardObject[i][j].color != turn)
+                if(boardObject[i][j].color !== turn)
                 moves.push([i,j]);
             }
         })
@@ -260,13 +296,32 @@ const ChessBoard = () => {
             <h1 className="text-4xl mb-6 text-white text-pretty font-extrabold">Let's play!!!</h1>
             <div className="grid grid-cols-8 w-96 h-96 bg-white rounded-lg border-4 border-gray-100">
                 {chessBoard()}
+                
             </div>
-            <div className="mt-4 p-4 bg-purple-700 text-white text-2xl font-bold rounded-lg shadow-lg">
-                <span className="capitalize">{turn}</span>'s Turn
-            </div>
+            {gameOver ? 
+                (
+                    <>
+                        <div className="mt-4 p-4 bg-blue-700 text-white text-2xl font-bold rounded-lg shadow-lg">
+                            Player {gameOver} Win
+                        </div>
+                        
+
+                    </>
+                ):(
+                    <>
+                        <div className="mt-4 p-4 bg-purple-700 text-white text-2xl font-bold rounded-lg shadow-lg">
+                            <span className="capitalize">{turn}</span>'s Turn
+                        </div>
+                        <button className="mt-4 p-4 bg-red-700 text-white text-2xl font-bold rounded-lg shadow-lg" onClick={handleRestart}>
+                                    Restart
+                        </button>
+                    </>
+            )} 
         </div>
     );
     
-};
+};  
 
 export default ChessBoard;
+
+
